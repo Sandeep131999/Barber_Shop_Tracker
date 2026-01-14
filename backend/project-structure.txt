@@ -1,0 +1,30 @@
+backend - Root project
+├── Controllers - API endpoints
+│   └── ShopsController.cs - Shops endpoint
+├── DTO - Transfer models
+│   └── ShopDto.cs - Shop DTO
+├── Models - Data entities
+│   ├── Barbers.cs - Barber entity
+│   ├── Customers.cs - Customer entity
+│   └── Shops.cs - Shop entity
+├── Repository - Data access
+│   ├── IShopRepository.cs - Shop contract
+│   └── ShopRepository.cs - Shop queries
+├── Services - Business logic
+│   ├── IShopService.cs - Service contract
+│   └── ShopService.cs - Service impl
+├── Configuration - Database config
+│   └── PostgresConfiguration.cs - Connection options
+├── SqlQueries - SQL scripts
+│   └── ShopQueries.xml - Shop SQL
+├── Properties - Project settings
+│   └── launchSettings.json - Launch profiles
+└── Program.cs - App startup
+
+
+Architecture summary:
+backend uses a clean, layered architecture: HTTP requests hit Controllers, which call Services for business 
+logic, which in turn use Repository classes and SQL queries to talk to PostgreSQL, returning shaped DTO
+objects built from Models.Configuration is centralized (Configuration folder and appsettings) so 
+infrastructure details are decoupled from domain logic, making the system easier to maintain, 
+test, and extend with new features.
