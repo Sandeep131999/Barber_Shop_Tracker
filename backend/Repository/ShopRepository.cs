@@ -1,12 +1,10 @@
 using backend.Models;
+using backend.Configuration;
 using Npgsql;
+using Serilog;
 
 namespace backend.Repository;
 
-/// <summary>
-/// Concrete implementation of <see cref="IShopRepository"/>.
-/// Uses Npgsql to read data from the PostgreSQL "shops" table.
-/// </summary>
 public class ShopRepository : IShopRepository
 {
     private readonly NpgsqlDataSource _dataSource;
@@ -18,31 +16,54 @@ public class ShopRepository : IShopRepository
 
     public async Task<IReadOnlyList<Shops>> GetAllAsync()
     {
-        const string sql = @"SELECT id, name, address, language, created_at, updated_at FROM shops";
+        Log.Information("Fetching all shops");
+
+        var xmlPath = Path.Combine(
+            AppDomain.CurrentDomain.BaseDirectory,
+            "SqlQueries",
+            "ShopQueries.xml");
+
+        var sql = SqlQueryReader.GetQuery(xmlPath, "GetAllShops");
 
         var shops = new List<Shops>();
 
         await using var connection = await _dataSource.OpenConnectionAsync();
         await using var command = new NpgsqlCommand(sql, connection);
-        await using var reader = await command.ExecuteReaderAsync();
 
-        while (await reader.ReadAsync())
+        try
         {
-            var shop = new Shops
-            {
-                Id = reader.GetGuid(0).ToString(),
-                Name = reader.GetString(1),
-                Address = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
-                Language = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                // store timestamps as ISO-8601 strings in this simple model
-                CreatedAt = reader.GetDateTime(4).ToString("O"),
-                UpdatedAt = reader.GetDateTime(5).ToString("O")
-            };
+            // 🔹 ONE SQL LOG (query only)
+            Log.ForContext("SourceContext", "PostgreSql")
+               .Information("Executing SQL: {Sql}", command.CommandText);
 
-            shops.Add(shop);
+            await using var reader = await command.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                shops.Add(new Shops
+                {
+                    Id = reader.GetGuid(0).ToString(),
+                    Name = reader.GetString(1),
+                    Address = reader.IsDBNull(2) ? string.Empty : reader.GetString(2),
+                    Language = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                    CreatedAt = reader.GetDateTime(4).ToString("O"),
+                    UpdatedAt = reader.GetDateTime(5).ToString("O")
+                });
+            }
+
+            Log.Information("Fetched {Count} shops", shops.Count);
+        }
+        catch (Exception ex)
+        {
+            // 🔴 Error log only once
+            Log.Error(
+                ex,
+                "Failed executing SQL: {Sql}",
+                command.CommandText);
+
+            throw;
         }
 
         return shops;
     }
 }
-

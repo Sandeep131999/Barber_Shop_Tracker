@@ -3,19 +3,31 @@ using backend.Repository;
 using backend.Services;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+//*****************************************
+// 0. Serilog Configuration
+//*****************************************
+SerilogConfigurator.Configure(builder.Configuration);
+// builder.Host.UseSerilog();
+
+//*****************************************
+// 1. Framework services
+//*****************************************
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 //*****************************************
-//1. Configure PostgreSQL from appsettings
+// 2. PostgreSQL configuration
 //*****************************************
-builder.Services.Configure<PostgresConfiguration>(builder.Configuration.GetSection("Postgres"));
+builder.Services.Configure<PostgresConfiguration>(
+    builder.Configuration.GetSection("Postgres"));
 
 //*****************************************
-//2. Register Npgsql data source for PostgreSQL
+// 3. Npgsql data source (Singleton)
 //*****************************************
 builder.Services.AddSingleton<NpgsqlDataSource>(sp =>
 {
@@ -24,7 +36,7 @@ builder.Services.AddSingleton<NpgsqlDataSource>(sp =>
 });
 
 //*****************************************
-//3. Register repository + service in DI
+// 4. Application services
 //*****************************************
 builder.Services.AddScoped<IShopRepository, ShopRepository>();
 builder.Services.AddScoped<IShopService, ShopService>();
@@ -32,19 +44,15 @@ builder.Services.AddScoped<IShopService, ShopService>();
 var app = builder.Build();
 
 //*****************************************
-//4. Configure the HTTP request pipeline.
+// 5. HTTP pipeline
 //*****************************************
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-//*****************************************
-//5. Map controllers for API endpoints
-//*****************************************
+// app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
-

@@ -9,7 +9,7 @@ CREATE TABLE shops (
 
 CREATE TABLE customers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    phone VARCHAR(20) UNIQUE NOT NULL,
+    phone VARCHAR(10),
     name VARCHAR(150),
     no_of_visits INT DEFAULT 0,
     recent_visit_date TIMESTAMP,

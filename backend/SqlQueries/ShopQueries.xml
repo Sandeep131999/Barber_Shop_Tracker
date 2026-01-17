@@ -4,16 +4,21 @@
 
   <query id="GetAllShops">
     <sql>
-      SELECT "Id", "Name", "Location"
-      FROM "Shops";
+      SELECT id, name, address, language, created_at, updated_at
+      FROM shops;
     </sql>
   </query>
 
   <query id="GetBarbersByShopId">
     <sql>
-      SELECT "Id", "Name", "ShopId"
-      FROM "Barbers"
-      WHERE "ShopId" = @ShopId;
+      SELECT 
+        "Id", 
+        "Name", 
+        "ShopId"
+      FROM 
+        "Barbers"
+      WHERE 
+        "ShopId" = @ShopId;
     </sql>
   </query>
 </queries>

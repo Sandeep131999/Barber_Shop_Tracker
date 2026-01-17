@@ -1,266 +1,314 @@
-# Backend - Barber Shop Tracker
+# Backend – Barber Shop Tracker
 
-.NET Core backend for handling QR scans, location tracking, and real-time updates.
+A **real-time barber shop tracking backend** designed to mirror how an actual barber shop works.
+The system is **staff-controlled**, inclusive for **children, elderly, uneducated people, and customers without smartphones**, and powers a **live visual barber shop layout**.
 
-## Tech Stack
-- **Framework**: .NET Core
-- **Database**: MongoDB Atlas (Cloud-hosted)
-- **Real-time**: SignalR
-- **Location**: Geolocation distance calculations
 
-## Backend TODO List
+## 🎯 Project Goal
+
+Build a backend system that:
+
+* Tracks customers, barbers, and queues in **real time**
+* Displays a **live barber shop layout** (chairs, customers, waiting time)
+* Avoids duplicate registrations **without using GPS or customer apps**
+* Works for **walk-ins, kids, elderly, and no-phone users**
+* Keeps control strictly with **barbers / shop staff**
+
+## 🧠 Core Design Principles
+
+* **No customer app, no QR scanning**
+* **No GPS or location enforcement**
+* **One active visit per person per shop**
+* **Staff controls customer entry, presence, and flow**
+* **System reflects reality, does not dictate it**
+
+
+## 🧱 Tech Stack
+
+* **Framework**: ASP.NET Core Web API (.NET)
+* **Database**: PostgreSQL
+* **ORM**: Dapper / EF Core (Next Phase)
+* **Real-time**: SignalR
+* **API Docs**: OpenAPI (Swagger)
+* **Authentication**: JWT (Barber / Staff only)
+* **Deployment**: Docker
+
+
+## 🗂 Backend TODO List
 
 ### #Todo1: Project Setup
-- [] Initialize .NET Core project
-- [ ] Setup project structure and folders
-- [ ] Install required NuGet packages (MongoDB, SignalR, JWT)
-- [ ] Configure MongoDB connection
 
-### #Todo2: Database Configuration
-- [ ] Setup MongoDB Atlas connection
-- [ ] Create MongoDB collections based on schema:
-  - shops (id, name, address, language, timestamps)
-  - barbers (id, shop_id, name, user_id, password_hash, is_active, timestamps)
-  - customers (id, phone, name, no_of_visits, recent_visit_date, last_verified, timestamps)
-  - visits (id, customer_id, shop_id, barber_id, status, entry_time, start_time, end_time, timestamps)
-  - queue (id, visit_id, shop_id, position, timestamps)
-- [ ] Create MongoDB models/entities
+* [ ] Initialize ASP.NET Core Web API
+* [ ] Apply Clean Architecture structure
+* [ ] Configure PostgreSQL connection
+* [ ] Enable OpenAPI (Swagger)
+* [ ] Environment-based configuration
+
+
+### #Todo2: Domain & Database Design
+
+* [ ] Shops
+* [ ] Barbers
+* [ ] Customers (registered & temporary)
+* [ ] Visits (active & historical)
+* [ ] Queue management
+* [ ] Presence tracking
+
+---
 
 ### #Todo3: API Endpoints
-- [ ] Shop management endpoints (static only)
-- [ ] Barber authentication and management (static only)
-- [ ] Customer registration and profile
-- [ ] Visit management (entry, start, end)
-- [ ] Queue management system
-- [ ] Real-time status updates
 
-### #Todo4: Location Logic
-- [ ] Implement geolocation distance calculation
-- [ ] Create shop location tracking
-- [ ] Handle customer location updates
-- [ ] Automatic visit completion based on location
+#### Customer & Walk-in Management
+
+* [ ] Create customer (phone optional)
+* [ ] Create walk-in / temporary customer
+* [ ] Prevent duplicate **active visits**
+* [ ] Fetch visit history
+
+#### Barber Management
+
+* [ ] Barber authentication
+* [ ] Barber availability status
+* [ ] Barber-chair mapping
+
+#### Visit & Queue Management
+
+* [ ] Customer entry (staff only)
+* [ ] Join queue
+* [ ] Mark customer as TEMP_OUT
+* [ ] Skip / No-show handling
+* [ ] Start service
+* [ ] Complete service
+
+---
+
+### #Todo4: Real-Time Barber Layout
+
+* [ ] Live queue updates
+* [ ] Barber chair status updates
+* [ ] Customer movement (waiting → service)
+* [ ] Live waiting time calculation
+
+---
 
 ### #Todo5: SignalR Implementation
-- [ ] Setup SignalR hub
-- [ ] Handle real-time queue updates
-- [ ] Broadcast visit status changes
-- [ ] Manage barber-customer connections
+
+* [ ] SignalR Hub setup
+* [ ] Queue update broadcasting
+* [ ] Visit status updates
+* [ ] Barber availability events
+* [ ] Auto-sync for new clients
+
+---
 
 ### #Todo6: Business Logic
-- [ ] Customer visit flow (entry → queue → service → exit)
-- [ ] Barber assignment logic
-- [ ] Queue position management
-- [ ] Service time calculations
 
-### #Todo7: Data Processing
-- [ ] Visit history and analytics
-- [ ] Customer visit statistics
-- [ ] Peak hour analysis
-- [ ] Barber performance metrics
+#### Visit Lifecycle
+
+```
+ENTER → WAITING → IN_SERVICE → COMPLETED
+```
+
+#### Presence States
+
+```
+PRESENT
+TEMP_OUT
+NO_SHOW
+```
+
+Rules:
+
+* Only **one active visit** (WAITING / IN_SERVICE) per person per shop
+* TEMP_OUT customers are skipped but not removed
+* Repeated skips can mark customer as NO_SHOW
+* Staff always controls state changes
+
+---
+
+### #Todo7: Analytics & Reporting
+
+* [ ] Visit history
+* [ ] Average waiting time
+* [ ] Peak hours
+* [ ] Barber performance
+* [ ] Daily shop summary
+
+---
 
 ### #Todo8: Security & Validation
-- [ ] Input validation for all endpoints
-- [ ] Barber authentication system
-- [ ] Customer phone verification
-- [ ] Rate limiting and error handling
+
+* [ ] Input validation
+* [ ] JWT-based barber authentication
+* [ ] Role-based access (Staff / Admin)
+* [ ] Rate limiting
+* [ ] Centralized error handling
+
+---
 
 ### #Todo9: Testing
-- [ ] Unit tests for all endpoints
-- [ ] Integration tests for visit flow
-- [ ] SignalR connection tests
-- [ ] MongoDB operation tests
+
+* [ ] Unit tests (Domain & Services)
+* [ ] Integration tests (Visit flow)
+* [ ] SignalR hub tests
+* [ ] Database integration tests
+
+---
 
 ### #Todo10: Deployment Setup
-- [ ] Docker configuration
-- [ ] Environment variables setup
-- [ ] Production MongoDB Atlas configuration
-- [ ] Performance optimizations
 
-## Database Schema Design
+* [ ] Dockerfile
+* [ ] Docker Compose (API + PostgreSQL)
+* [ ] Environment variable configuration
+* [ ] Production performance tuning
 
-### Shops Collection
-```json
-{
-  "_id": "ObjectId",
-  "name": "Shop Name",
-  "address": "Shop Address",
-  "language": "en",
-  "location": {
-    "latitude": 12.9716,
-    "longitude": 77.5946
-  },
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
-}
-```
+---
 
-### Barbers Collection
-```json
-{
-  "_id": "ObjectId",
-  "shop_id": "ObjectId",
-  "name": "Barber Name",
-  "user_id": "unique_user_id",
-  "password_hash": "hashed_password",
-  "is_active": true,
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
-}
-```
+## 🗄 Database Schema (High-Level)
 
-### Customers Collection
-```json
-{
-  "_id": "ObjectId",
-  "phone": "1234567890",
-  "name": "Customer Name",
-  "no_of_visits": 5,
-  "recent_visit_date": "2024-01-01",
-  "last_verified": true,
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
-}
-```
+### Customers
 
-### Visits Collection
-```json
-{
-  "_id": "ObjectId",
-  "customer_id": "ObjectId",
-  "shop_id": "ObjectId",
-  "barber_id": "ObjectId",
-  "status": "entered|queued|in_progress|completed|cancelled",
-  "entry_time": "2024-01-01T10:00:00Z",
-  "start_time": "2024-01-01T10:30:00Z",
-  "end_time": "2024-01-01T11:30:00Z",
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
-}
-```
+* `id` (UUID)
+* `display_name`
+* `phone` (nullable)
+* `is_temporary`
+* `created_at`
 
-### Queue Collection
-```json
-{
-  "_id": "ObjectId",
-  "visit_id": "ObjectId",
-  "shop_id": "ObjectId",
-  "position": 1,
-  "created_at": "2024-01-01T00:00:00Z",
-  "updated_at": "2024-01-01T00:00:00Z"
-}
-```
+### Barbers
 
-## API Endpoints Design
+* `id` (UUID)
+* `name`
+* `chair_number`
+* `status` (AVAILABLE, BUSY)
 
-### Shop Management (Static Only)
-- `POST /api/shops` - Create new shop
-- `GET /api/shops/{id}` - Get shop details
-- `PUT /api/shops/{id}` - Update shop information
+### Visits
 
-### Barber Management (Static Only)
-- `POST /api/barbers/login` - Barber authentication
-- `POST /api/barbers/register` - Register new barber
-- `GET /api/barbers/shop/{shop_id}` - Get barbers for a shop
+* `id` (UUID)
+* `customer_id`
+* `barber_id` (nullable)
+* `shop_id`
+* `status` (WAITING, IN_SERVICE, COMPLETED, CANCELLED)
+* `presence_status` (PRESENT, TEMP_OUT, NO_SHOW)
+* `joined_at`
+* `started_at`
+* `completed_at`
 
-### Customer Management
-- `POST /api/customers/register` - Register new customer
-- `GET /api/customers/{phone}` - Get customer details
-- `POST /api/customers/verify` - Verify customer phone
+> **Database rule**: Only one active visit per customer per shop
+> (enforced via partial unique index)
 
-### Visit Management
-- `POST /api/visits/enter` - Customer enters shop
-- `POST /api/visits/start/{visit_id}` - Start service
-- `POST /api/visits/complete/{visit_id}` - Complete visit
-- `GET /api/visits/customer/{customer_id}` - Get customer visit history
+---
 
-### Queue Management
-- `GET /api/queue/shop/{shop_id}` - Get current queue
-- `POST /api/queue/join` - Join queue
-- `DELETE /api/queue/leave/{visit_id}` - Leave queue
+## 🌐 API Endpoints (Draft)
 
-### SignalR Events
-- `QueueUpdate` - Queue position changes
-- `VisitStatusUpdate` - Visit status updates
-- `BarberAvailable` - Barber availability changes
+### Customer
 
-## Installation & Setup
+* `POST /api/customers`
+* `GET /api/customers/{id}`
+* `GET /api/customers/{id}/visits`
 
-1. Create new .NET Core Web API project:
+### Visits
+
+* `POST /api/visits/enter`
+* `POST /api/visits/temp-out/{visitId}`
+* `POST /api/visits/start/{visitId}`
+* `POST /api/visits/complete/{visitId}`
+* `POST /api/visits/no-show/{visitId}`
+
+### Queue
+
+* `GET /api/queue/shop/{shopId}`
+* `POST /api/queue/reorder`
+
+---
+
+## 🔴 SignalR Events
+
+* `QueueUpdated`
+* `VisitStatusChanged`
+* `PresenceChanged`
+* `BarberStatusChanged`
+* `WaitingTimeUpdated`
+
+---
+
+## ⚙ Installation & Setup
+
+### 1. Create Project
+
 ```bash
 dotnet new webapi -n BarberShop.API
 cd BarberShop.API
 ```
 
-2. Install required NuGet packages:
+### 2. Install Packages
+
 ```bash
-dotnet add package MongoDB.Driver
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
 dotnet add package Microsoft.AspNetCore.SignalR
 dotnet add package Microsoft.AspNetCore.Authentication.JwtBearer
-dotnet add package Microsoft.Extensions.Configuration
-dotnet add package System.ComponentModel.Annotations
-dotnet add package GeoCoordinate.NetCore
+dotnet add package Swashbuckle.AspNetCore
 ```
 
-3. Setup environment variables (appsettings.json):
+### 3. App Settings (PostgreSQL)
+
 ```json
 {
-  "MongoDB": {
-    "ConnectionString": "mongodb+srv://username:password@cluster.mongodb.net/barber_shop?retryWrites=true&w=majority",
-    "DatabaseName": "barber_shop"
+  "Postgres": {
+    "ConnectionString": "Host=localhost;Port=5432;Database=barbershop;Username=postgres;Password=password"
   },
   "Jwt": {
-    "Key": "your-secret-key-here",
+    "Key": "your-secret-key",
     "Issuer": "BarberShop.API",
     "Audience": "BarberShop.Client",
-    "ExpireMinutes": 30
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "AllowedHosts": "*"
+    "ExpireMinutes": 60
+  }
 }
 ```
 
-4. Run the application:
-```bash
-dotnet run
+---
+
+## 📂 Clean Architecture Structure
+
+```
+backend/
+ ├── API
+ │   ├── Controllers
+ │   ├── Hubs
+ │   ├── DTOs
+ │   └── Program.cs
+ ├── Application
+ │   ├── Interfaces
+ │   ├── Services
+ │   └── Validators
+ ├── Domain
+ │   ├── Entities
+ │   └── Enums
+ ├── Infrastructure
+ │   ├── Data
+ │   ├── Repositories
+ │   └── SignalR
+ └── Tests
 ```
 
-5. Access the API:
-- API Base URL: https://localhost:5001 or http://localhost:5000
-- Swagger UI: https://localhost:5001/swagger
+---
 
-## Project Structure
-```
-BarberShop.API/
-├── Controllers/
-│   ├── ShopsController.cs
-│   ├── BarbersController.cs
-│   ├── CustomersController.cs
-│   ├── VisitsController.cs
-│   └── QueueController.cs
-├── Models/
-│   ├── Entities/
-│   │   ├── Shop.cs
-│   │   ├── Barber.cs
-│   │   ├── Customer.cs
-│   │   ├── Visit.cs
-│   │   └── Queue.cs
-│   └── DTOs/
-├── Services/
-│   ├── IMongoService.cs
-│   ├── MongoService.cs
-│   ├── IAuthService.cs
-│   ├── AuthService.cs
-│   └── LocationService.cs
-├── Hubs/
-│   └── BarberShopHub.cs
-├── Configuration/
-│   └── MongoConfiguration.cs
-├── Program.cs
-├── appsettings.json
-└── BarberShop.API.csproj
-```
+## 🏁 Final Note
+
+This backend is intentionally designed to:
+
+* Match **real barber shop behavior**
+* Be **inclusive and simple**
+* Support **real-time visual layouts**
+* Scale from **single shop to multiple branches**
+
+> **Barbers control reality.
+> The system reflects reality.**
+
+---
+
+🚀 **Next possible steps**:
+
+* Real-time UI wireframe
+* SignalR hub implementation
+* Queue algorithm
+* PostgreSQL index & constraint design
