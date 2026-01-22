@@ -21,7 +21,7 @@ public class ShopRepository : IShopRepository
         var xmlPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
             "SqlQueries",
-            "ShopQueries.xml");
+            "BarberShop.xml");
 
         var sql = SqlQueryReader.GetQuery(xmlPath, "GetAllShops");
 
@@ -55,7 +55,6 @@ public class ShopRepository : IShopRepository
         }
         catch (Exception ex)
         {
-            // 🔴 Error log only once
             Log.Error(
                 ex,
                 "Failed executing SQL: {Sql}",

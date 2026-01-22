@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<queries>
+  <!-- Example SQL queries for the Barbershop backend -->
+  <query id="GetAllShops">
+    <sql>
+      SELECT 
+        id
+        ,name
+        ,address 
+        ,language 
+        ,created_at 
+        ,updated_at
+      FROM 
+        shops;
+    </sql>
+  </query>
+
+  <!-- Example SQL queries for the Barbershop backend -->
+  <query id="InsertCustomer">
+    <sql>
+      INSERT INTO customers
+    (
+      name,
+      phone
+    )
+    VALUES
+    (
+      @name,
+      @phone
+    )
+    </sql>
+  </query>
+</queries>
+

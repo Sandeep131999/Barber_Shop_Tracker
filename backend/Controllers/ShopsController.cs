@@ -8,7 +8,7 @@ namespace backend.Controllers;
 /// Controller for shop-related API endpoints
 /// </summary>
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class ShopsController : ControllerBase
 {
     private readonly IShopService _shopService;

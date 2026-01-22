@@ -3,20 +3,25 @@ backend - Root project
 │   └── ShopsController.cs - Shops endpoint
 ├── DTO - Transfer models
 │   └── ShopDto.cs - Shop DTO
+│   └── CustomerDto.cs - Customer DTO
 ├── Models - Data entities
 │   ├── Barbers.cs - Barber entity
 │   ├── Customers.cs - Customer entity
 │   └── Shops.cs - Shop entity
 ├── Repository - Data access
+│   ├── ICustomerRepository.cs - Customer 
+│   └── ICustomerRepository.cs - Customer queries
 │   ├── IShopRepository.cs - Shop contract
 │   └── ShopRepository.cs - Shop queries
 ├── Services - Business logic
 │   ├── IShopService.cs - Service contract
 │   └── ShopService.cs - Service impl
+│   ├── ICustomerService.cs - Service contract
+│   └── CustomerService.cs - Service impl
 ├── Configuration - Database config
 │   └── PostgresConfiguration.cs - Connection options
 ├── SqlQueries - SQL scripts
-│   └── ShopQueries.xml - Shop SQL
+│   └── BarberShop.xml - Complete Project SQL
 ├── Properties - Project settings
 │   └── launchSettings.json - Launch profiles
 └── Program.cs - App startup
