@@ -16,7 +16,7 @@ public class CustomerService : ICustomerService
         _repository = repository;
     }
 
-    public async Task CreateAsync(CustomerDto customerDto)
+    public async Task<Guid> InsertAsync(CustomerDto customerDto)
     {
         // 1) Map DTO → Entity
         var customer = new Customers
@@ -26,6 +26,9 @@ public class CustomerService : ICustomerService
         };
 
         // 2) Call repository
-        await _repository.InsertAsync(customer);
+        var customer_Id =  await _repository.InsertAsync(customer);
+
+        // 3) Return the generated Id
+        return customer_Id;
     }
 }

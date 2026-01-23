@@ -1,4 +1,5 @@
 using backend.DTO;
+using backend.Models;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,20 +13,27 @@ namespace backend.Controllers;
 public class CustomerController : ControllerBase
 {
     private readonly ICustomerService _customerService;
+    private readonly IVisitorService _visitorService;
 
-    public CustomerController(ICustomerService customerService)
+    public CustomerController(ICustomerService customerService,IVisitorService visitorService)
     {
         _customerService = customerService;
+        _visitorService = visitorService;
     }
 
     /// <summary>
     /// Creates a new customer
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> CreateCustomer([FromBody] CustomerDto dto)
+    public async Task<IActionResult> CreateCustomer([FromBody] CustomerDto  customers)
     {
-        await _customerService.CreateAsync(dto);
-        return Ok();
+        var customerId = await _customerService.InsertAsync(customers);
+        var visitor = new Visitor
+        {
+            CustomerId = customerId
+        };
+        var visitId = await _visitorService.CreateAsync(visitor);
+        return Ok(visitId);
     }
 }
 

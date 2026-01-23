@@ -2,7 +2,6 @@ using backend.Models;
 using backend.Configuration;
 using Npgsql;
 using Serilog;
-using System;
 
 namespace backend.Repository;
 
@@ -15,10 +14,12 @@ public class CustomerRepository : ICustomerRepository
         _dataSource = dataSource;
     }
 
-    public async Task InsertAsync(Customers customer)
+
+    public async Task<Guid>InsertAsync(Customers customer)
     {
         Log.Information("Inserting customer {@Customer}", customer);
 
+        //To get the path
         var xmlPath = Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
             "SqlQueries",
@@ -38,9 +39,10 @@ public class CustomerRepository : ICustomerRepository
             Log.ForContext("SourceContext", "PostgreSql")
                .Information("Executing INSERT SQL");
 
-            await command.ExecuteNonQueryAsync();
-
-            Log.Information("Customer inserted successfully");
+            //! means guid must no empty
+            var customerId = (Guid)(await command.ExecuteScalarAsync())!;
+            Log.Information("Customer inserted successfully with ID {CustomerId}", customerId);
+            return customerId;
         }
         catch (Exception ex)
         {

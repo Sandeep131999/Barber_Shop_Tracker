@@ -4,5 +4,5 @@ namespace backend.Services;
 
 public interface ICustomerService
 {
-    Task CreateAsync(CustomerDto customer);
+    Task<Guid> InsertAsync(CustomerDto customer);
 }

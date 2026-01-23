@@ -42,13 +42,14 @@ CREATE TABLE visits (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE queue (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    visit_id UUID NOT NULL,
-    shop_id UUID NOT NULL,
-    position INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+create table public.queue (
+  id uuid default gen_random_uuid() not null
+  , visit_id uuid not null
+  , shop_id uuid not null
+  , position integer not null
+  , created_at timestamp(6) without time zone default CURRENT_TIMESTAMP
+  , updated_at timestamp(6) without time zone default CURRENT_TIMESTAMP
+  , primary key (id)
 );
 
 

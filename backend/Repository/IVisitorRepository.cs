@@ -1,18 +1,15 @@
 using backend.Models;
 
 namespace backend.Repository;
-
 /// <summary>
 /// REPOSITORY = talks directly to the database.
-/// Handles customer persistence.
+/// Handles Visitors persistence.
 /// </summary>
-public interface ICustomerRepository
+public interface IVisitorRepository
 {
     /// <summary>
     /// Inserts a customer.
     /// </summary>
-    Task<Guid> InsertAsync(Customers customer);
+    Task<Guid> InsertAsync(Visitor visits);
 
 }
-
-

@@ -15,7 +15,7 @@
     </sql>
   </query>
 
-  <!-- Example SQL queries for the Barbershop backend -->
+  <!-- Insert customer-->
   <query id="InsertCustomer">
     <sql>
       INSERT INTO customers
@@ -28,7 +28,46 @@
       @name,
       @phone
     )
+    RETURNING id;
     </sql>
   </query>
+
+  
+  <!-- Insert visits-->
+  <query id="InsertVisits">
+    <sql>
+      INSERT INTO visits
+    (
+      customer_id,
+      shop_id,
+      barber_id
+    )
+    VALUES
+    (
+      @customer_id,
+      @shop_id,
+      @barber_id
+    )
+    RETURNING id;
+    </sql>
+  </query>
+
+    <!-- Insert queue-->
+  <query id="InsertQueue">
+    <sql>
+      INSERT INTO queue
+    (
+      visit_id,
+      shop_id,
+    )
+    VALUES
+    (
+      @visit_id,
+      @shop_id,
+    )
+    RETURNING id;
+    </sql>
+  </query>
+
 </queries>
 
