@@ -1,0 +1,16 @@
+src/
+├── api/                 # All HTTP calls
+│   ├── httpClient.ts
+│   ├── shopApi.ts
+│   └── customerApi.ts
+├── models/              # Frontend types (match DTOs)
+│   ├── Shop.ts
+│   └── Customer.ts
+├── pages/
+│   ├── ShopsPage.tsx
+│   └── ShopDetailsPage.tsx
+├── components/
+│   └── ShopCard.tsx
+├── hooks/
+│   └── useShops.ts
+└── App.tsx
